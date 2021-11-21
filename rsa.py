@@ -21,7 +21,7 @@ def decimal_to_binary(N, pad):
 
 
 def modular_exponentiation(base, exp, modulus):
-    """ computes base^exp mod modulus using repeated squaring; needed for key generation in a reasonable
+    """ computes base^exp mod modulus using repeated squaring; needed for encryption/decryption in a reasonable
         amount of time """
     binary_rep = decimal_to_binary(exp, -1)[::-1]
     answer = 1
