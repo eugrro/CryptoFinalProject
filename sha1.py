@@ -71,4 +71,4 @@ def run(msg):
 	return sha1(msg)
 
 if __name__ == "__main__":
-	print(run("Hi this is sha1 for crypto!"))
+	print(run('0'))
