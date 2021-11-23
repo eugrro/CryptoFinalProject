@@ -72,3 +72,5 @@ def run(msg):
 
 if __name__ == "__main__":
 	print(run('0'))
+	print(run("35"))
+	print(int(run("435094534"), 16))
