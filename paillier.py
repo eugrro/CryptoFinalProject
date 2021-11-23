@@ -1,15 +1,11 @@
 from Crypto.Util import number
 import random
+from rsa import gcd
 
-def lcm(x,y):
-	if x > y:
-		big = x
-	else:
-		big = y
-	while(True):
-		if big%x == 0 and big%y == 0:
-			return big
-		big += 1
+
+def lcm(a, b):
+	return (a * b) // gcd(a, b)
+
 
 #extended euclidean alg
 def extEuc(a, b):
@@ -19,6 +15,7 @@ def extEuc(a, b):
 		g, y, x = extEuc(b % a, a)
 		return g, x - (b // a) * y, y
 
+
 def modInv(a,b):
 	g,x,y = extEuc(a,b)
 	if g != 1:
@@ -26,11 +23,14 @@ def modInv(a,b):
 	else:
 		return x%b
 
+
 def L(x,n):
 	return (x-1%n)/n
 
+
 def paillier(bits):
 	u = -1
+	g, p, q, lamb = 0, 0, 0, 0
 	while u == -1:
 		p = number.getPrime(bits)
 		q = number.getPrime(bits)
@@ -41,6 +41,7 @@ def paillier(bits):
 		g = random.randint(1,n**2)
 		u = modInv( L( pow(g,lamb,n**2), n), n)
 	return g,p,q,lamb,int(u)
+
 
 if __name__ == "__main__":
 	g,p,q,lamb,u = paillier(10)
