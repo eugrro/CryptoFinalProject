@@ -8,6 +8,7 @@ from text_to_number import text_to_number
 from text_to_number import number_to_text
 
 
+
 def decimal_to_binary(N, pad):
     """ converts a nonnegative integer N in base 10 to a list of bits corresponding to the binary representation
         of N. Pads with leading 0s until it's of length pad; assumes that lg N <= pad """
