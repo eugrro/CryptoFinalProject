@@ -2,6 +2,8 @@
 import secrets
 from sympy.ntheory import isprime
 from sha1 import sha1
+from numpy import log
+
 
 
 def decimal_to_binary(N, pad):
@@ -64,15 +66,26 @@ def make_prime(bits):
 
 def rsa_encrypt(message, public_key):
     """ public_key is in the form (e, pq) where e is the exponent that the message is raised to for encryption
-        and pq is the product of the primes
+        and pq is the product of the primes. Message is a normal string which will be encrypted in
+        128-character (1024-bit) chunks in CBC mode.
 
-        returns the corresponding ciphertext """
+        returns the corresponding ciphertext. """
+
+    # OAEP pad the message
+
+    # encrypt in CBC mode
+
+    # return the ciphertext as a string
     return modular_exponentiation(message, public_key[0], public_key[1])
 
 
 def rsa_decrypt(ciphertext, public_key, private_key):
     """ public_key is in the form it was above, private_key is just the decryption exponent
-        returns the corresponding plaintext """
+        returns the corresponding plaintext. Ciphertext is a normal string """
+
+    # decrypt from CBC mode
+
+    # un-OAEP pad the message
     return modular_exponentiation(ciphertext, private_key, public_key[1])
 
 
@@ -88,29 +101,40 @@ def make_key_pair():
 
 
 def mask_generation_function(message, output_length):
-    """ MGF based on SHA-1. """
-    pass
+    """ MGF based on SHA-1. SHA-1 returns a hash of length 20 bytes.
+        Returns a 'hash' of output_length bytes. """
+    output = 0
+    for i in range(0, (output_length // 20) + 1):
+        output = (output << 160) + int(sha1(message + i), 16)
+    # now we probably ha
+    return output
+
 
 def oaep(message, k0, k1, p, q):
     """ See https://en.wikipedia.org/wiki/Optimal_asymmetric_encryption_padding ;
         this makes this RSA implementation semantically secure. This needs to be
         used before actually encrypting the message. """
     # message is 1024 bits in length; number of bits in RSA modulus is floor(lg(p) + lg(q));
-    #
     r = secrets.randbits(k0)
+    n = p * q
+    n_bits = (log(n) / log(2)) // 1  # the number of bits in n
+    X = (message << k1) ^ mask_generation_function(r, n - k0)
+    Y = r ^ mask_generation_function(X, k0)
+    return (X << k0) + Y
 
 
-
-def inverse_oaep(random_message, k0, k1):
+def inverse_oaep(random_message, k0, k1, n):
     """ Given X || Y from above and k0, k1, recovers the original message. """
-    Y = random_message % 2**k0
+    n_bits = (log(n)/log(2)) // 1  # the number of bits in n
+    Y = random_message % (1 << k0)
     X = random_message >> k0
-    r = Y ^ H(X)
-    message_with_zeroes = X ^ G(r)
+    r = Y ^ mask_generation_function(X, k0)
+    message_with_zeroes = X ^ mask_generation_function(r, n_bits - k0)
     return message_with_zeroes >> k1
 
 
 if __name__ == "__main__":
+    print(mask_generation_function("asdf", 20))
     for i in range(1, 1000):
         print(i)
         p, q, e, d = make_key_pair()
