@@ -15,23 +15,20 @@ if __name__ == "__main__":
 	server.bind(('127.0.0.1',port))
 	server.listen()
 	while True:
-		print("HI")
 		client, addr = server.accept()
 		print("Client at {} connected".format(addr))
+
 		client.sendall("You've connected to the Bank".encode())
 		clientPubkey = list(map(int,recMsg(client, 4096).split(",")))
-		print(clientPubkey)
-		print("++++++++++++++++++++++++++++++++")
+		
 		aesKey = aes.generate_key()
 		hmacKey = hmac_ours.generate_key()
-		msg = ''.join(map(str,map(ord,aesKey))) + str(ord(',')) + ''.join(map(str,map(ord,hmacKey)))
-		msg +=  str(ord(',')) + hmac_ours.hexToDec(hmac_ours.hmac(msg,hmacKey))
-		msg = int(msg)
-		print(msg)
-		print(text_to_number.number_to_text(msg))
+		
+		msg = chr(16) + aesKey + chr(16) + hmacKey
+		msg += hmac_ours.hexToText(hmac_ours.hmac(msg,hmacKey))
+		
 		keys = rsa.rsa_encrypt(msg, clientPubkey)
-		print(keys)
-		client.sendall(str(keys).encode())
+		client.sendall(keys.encode())
 
 		userInfo = recMsg(client, 4096)
 		userInfo = rsa.rsa_decrypt(userInfo,clientPubkey,clientPubkey[0])
@@ -39,7 +36,8 @@ if __name__ == "__main__":
 		length2 = ord(userInfo[length1+1])
 		username = userInfo[1:length1+1]
 		password = userInfo[length1+2:-20]
-		if hmac_ours.hexToText(hmac_ours.hmac(userInfo[:-20])) != userInfo[-20:]:
+		
+		if hmac_ours.hexToText(hmac_ours.hmac(userInfo[:-20],hmacKey)) != userInfo[-20:]:
 			print("Tampering found, hash isn't equal")
 			break;
 

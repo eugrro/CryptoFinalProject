@@ -13,7 +13,7 @@ def recMsg(socket, size):
 if __name__ == "__main__":
 	host = '127.0.0.1' #input("Bank IP: ")
 	port = 65432 #int(input("Port: "))
-	#username = input("Username: ")
+	
 	client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 	client.connect((host,port))
 
@@ -37,19 +37,12 @@ if __name__ == "__main__":
 
 	
 	data = recMsg(client, 4096)
-	print(int(data))
-	keys = rsa.rsa_decrypt(int(data),[e,n],d)
-	keys = text_to_number.number_to_text(keys)
-	print(keys)
-	keyArray = keys.split(str(ord(",")))
-	print(keyArray)
-	#keys = text_to_number.number_to_text(keys)
-	#print(keys)
-	#print(ord(keys[0]))
-	#length1 = ord(keys[0])
-	#length2 = ord(data[length1+1])
-	aesKey = keyArray[0]  #keys[1:length1+1]
-	macKey = keyArray[1]  #[length1+2:-20]
+	keys = rsa.rsa_decrypt(data,[e,n],d)
+
+	length1 = ord(keys[0])
+	length2 = ord(keys[length1+1])
+	aesKey = keys[1:length1+1]
+	hmacKey = keys[length1+2:-20]
 	if hmac_ours.hexToText(hmac_ours.hmac(keys[:-20], macKey)) != keys[-20:]:
 		print("Tampering found, hash isn't equal")
 		
@@ -57,7 +50,7 @@ if __name__ == "__main__":
 		username = input("Username: ")
 		password = input("Password: ")
 		msg = chr(len(username))+username + chr(len(password))+password
-		msg += hmac_ours.hexToText(hmac_ours.hmac(msg, macKey))
+		msg += hmac_ours.hexToText(hmac_ours.hmac(msg, hmacKey))
 		final = rsa.rsa_encrypt(msg, (d,n))
 		client.sendall(final.encode())
 
