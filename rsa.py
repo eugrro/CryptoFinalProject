@@ -1,6 +1,7 @@
 """ RSA implementation. """
 import secrets
 from sympy.ntheory import isprime
+from sha1 import sha1
 
 
 def decimal_to_binary(N, pad):
@@ -84,6 +85,29 @@ def make_key_pair():
     d = multiplicative_inverse(e, (p - 1)*(q - 1))
 
     return p, q, e, d
+
+
+def mask_generation_function(message, output_length):
+    """ MGF based on SHA-1. """
+    pass
+
+def oaep(message, k0, k1, p, q):
+    """ See https://en.wikipedia.org/wiki/Optimal_asymmetric_encryption_padding ;
+        this makes this RSA implementation semantically secure. This needs to be
+        used before actually encrypting the message. """
+    # message is 1024 bits in length; number of bits in RSA modulus is floor(lg(p) + lg(q));
+    #
+    r = secrets.randbits(k0)
+
+
+
+def inverse_oaep(random_message, k0, k1):
+    """ Given X || Y from above and k0, k1, recovers the original message. """
+    Y = random_message % 2**k0
+    X = random_message >> k0
+    r = Y ^ H(X)
+    message_with_zeroes = X ^ G(r)
+    return message_with_zeroes >> k1
 
 
 if __name__ == "__main__":
