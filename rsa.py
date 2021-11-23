@@ -76,8 +76,8 @@ def rsa_decrypt(ciphertext, public_key, private_key):
 
 
 def make_key_pair():
-    """ Makes an RSA key pair; returns (p, q, e, d) """
-    p, q = make_prime(2048), make_prime(2048)
+    """ Makes a 2048-bit RSA key pair; returns (p, q, e, d) """
+    p, q = make_prime(1024), make_prime(1024)
     e = 0
     while gcd(e, (p - 1)*(q - 1)) != 1:
         e = secrets.randbelow((p - 1)*(q - 1))
