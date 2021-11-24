@@ -1,4 +1,11 @@
+import rsa
+import hmac_ours
 import socket
+import os
+import aes
+import text_to_number
+import sha1
+import random
 
 HOST = '127.0.0.1'  # The server's hostname or IP address
 PORT = 65432        # The port used by the server
@@ -32,8 +39,6 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 
     #send public key to Bank
     msg = "{},{}".format(e,n)
-    print(e)
-    print(n)
     s.sendall(msg.encode())
     print("RSA public key sent to Bank",flush=True)
 
@@ -62,7 +67,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         #receive auth from bank
         auth = recMsg(s, 4096)
         auth = aes.aes_cbc_decrypt(auth,aesKey,iv)
-        if auth == "SUCCESS"
+        if auth == "SUCCESS":
             while True:
                 userInput = input("Enter a message to send: ")
                 s.sendall(str.encode(userInput))
