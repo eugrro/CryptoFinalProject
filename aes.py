@@ -1,4 +1,7 @@
 import sha1
+import random
+import string
+
 s_box = [
     0x63, 0x7C, 0x77, 0x7B, 0xF2, 0x6B, 0x6F, 0xC5, 0x30, 0x01, 0x67, 0x2B, 0xFE, 0xD7, 0xAB, 0x76,
     0xCA, 0x82, 0xC9, 0x7D, 0xFA, 0x59, 0x47, 0xF0, 0xAD, 0xD4, 0xA2, 0xAF, 0x9C, 0xA4, 0x72, 0xC0,
@@ -155,6 +158,10 @@ def padding(plainText):
         plainText += chr(0)
     return plainText
 
+def removePadding(plainText):
+    while plainText[-1] == chr(0):
+        plainText = plainText[:-1]
+    return plainText
 def getBlocks(plainText):
     return [plainText[i:i+16] for i in range(0,len(plainText),16)]
 
@@ -173,7 +180,7 @@ def aes_cbc_encrypt(plainText, key, iv):
         for i in range(len(b)):
             for j in range(len(b[i])):
                 cipher += chr(b[i][j])
-    return cipherText, cipher
+    return cipher
 
 
 def aes_block_decrypt(cipherText, prev, expandedKey):
@@ -206,11 +213,15 @@ def aes_cbc_decrypt(cipherText, key, iv):
         for i in range(len(b)):
             for j in range(len(b[i])):
                 plain += chr(b[i][j])
-    return plainText, plain
+    return removePadding(plain)
+
+def generate_key():
+    chars = string.ascii_letters + string.digits + string.punctuation
+    return ''.join(random.choice(chars) for i in range(16))
 
 if __name__ == "__main__":
     key = "abcdefghijklmnop"
-    msg = 'This is a test of AES for crypto final project!!'
+    msg = 'This is a test of AES for crypto final projectaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa!!'
     counter = 0
     iv = sha1.run(str(counter))[:32]
     tmp =''
@@ -218,7 +229,7 @@ if __name__ == "__main__":
         val = iv[i:i+2]
         tmp += chr(int(val,16))
     iv = tmp
-    cipherBlocks, cipherText = aes_cbc_encrypt(msg,key,iv)
+    cipherText = aes_cbc_encrypt(msg,key,iv)
     print(cipherText)
-    plainBlocks, plainText = aes_cbc_decrypt(cipherText,key,iv)
+    plainText = aes_cbc_decrypt(cipherText,key,iv)
     print(plainText)

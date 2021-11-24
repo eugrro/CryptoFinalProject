@@ -68,10 +68,10 @@ def make_prime(bits):
 
 def rsa_encrypt(message, public_key):
     """ public_key is in the form (e, pq) where e is the exponent that the message is raised to for encryption
-        and pq is the product of the primes. Message is a normal string which will be encrypted in
+        and pq is the product of the primes. Message is a normal string which will be encrypted in 
         128-character (1024-bit) chunks in CBC mode.
 
-        returns the corresponding ciphertext. """
+        returns the corresponding ciphertext """
 
     message_blocks = [secrets.randbits(2046)]  # IV for CBC
 
@@ -136,7 +136,6 @@ def make_key_pair():
     d = multiplicative_inverse(e, (p - 1)*(q - 1))
 
     return p, q, e, d
-
 
 def mask_generation_function(message, output_length):
     """ MGF based on SHA-1. SHA-1 returns a hash of length 20 bytes.
