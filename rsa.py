@@ -8,7 +8,6 @@ from text_to_number import text_to_number
 from text_to_number import number_to_text
 
 
-
 def decimal_to_binary(N, pad):
     """ converts a nonnegative integer N in base 10 to a list of bits corresponding to the binary representation
         of N. Pads with leading 0s until it's of length pad; assumes that lg N <= pad """
@@ -74,7 +73,7 @@ def rsa_encrypt(message, public_key):
 
         returns the corresponding ciphertext. """
 
-    message_blocks = [123456789]  # IV for CBC
+    message_blocks = [secrets.randbits(2046)]  # IV for CBC
 
     for i in range(0, len(message)//128):
         message_blocks.append(text_to_number(message[i:i+128]))
@@ -180,6 +179,3 @@ if __name__ == "__main__":
         p, q, e, d = make_key_pair()
         print(ptext == rsa_decrypt(rsa_encrypt(ptext, (e, p*q)), (e, p*q), d))
 
-
-    print(table)
-    print(other_table)
