@@ -4,6 +4,8 @@ import socket
 import os
 import aes
 import text_to_number
+import sha1
+import random
 
 def recMsg(socket, size):
 	data = socket.recv(size)
@@ -41,16 +43,19 @@ if __name__ == "__main__":
 
 	length1 = ord(keys[0])
 	length2 = ord(keys[length1+1])
+	length3 = ord(keys[length1+1+length2+1])
 	aesKey = keys[1:length1+1]
-	hmacKey = keys[length1+2:-20]
-	if hmac_ours.hexToText(hmac_ours.hmac(keys[:-20], macKey)) != keys[-20:]:
+	hmacKey = keys[length1+2:length1+1+length2+1]
+	iv = keys[length1+1+length2+2:length1+1+length2+1+length3+1]
+
+	if hmac_ours.hexToText(hmac_ours.hmac(keys[:-20], hmacKey)) != keys[-20:]:
 		print("Tampering found, hash isn't equal")
 		
 	else:
-		username = input("Username: ")
-		password = input("Password: ")
-		msg = chr(len(username))+username + chr(len(password))+password
+		username = 'Aaron' #input("Username: ")
+		password = '1234'  #input("Password: ")
+		msg = chr(len(username)) + username + chr(len(password)) + password
 		msg += hmac_ours.hexToText(hmac_ours.hmac(msg, hmacKey))
-		final = rsa.rsa_encrypt(msg, (d,n))
+		final = aes.aes_cbc_encrypt(msg, aesKey, iv)
 		client.sendall(final.encode())
 
