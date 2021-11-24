@@ -5,7 +5,7 @@ import os
 import aes
 import text_to_number
 import sha1
-import random
+import secrets
 
 HOST = '127.0.0.1'  # The server's hostname or IP address
 PORT = 65432        # The port used by the server

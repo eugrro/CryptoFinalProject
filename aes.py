@@ -1,5 +1,5 @@
 import sha1
-import random
+import secrets
 import string
 
 s_box = [
@@ -217,7 +217,7 @@ def aes_cbc_decrypt(cipherText, key, iv):
 
 def generate_key():
     chars = string.ascii_letters + string.digits + string.punctuation
-    return ''.join(random.choice(chars) for i in range(16))
+    return ''.join(secrets.choice(chars) for i in range(16))
 
 if __name__ == "__main__":
     key = "abcdefghijklmnop"
