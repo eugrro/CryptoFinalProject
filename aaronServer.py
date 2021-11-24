@@ -4,7 +4,7 @@ import socket
 import aes
 import text_to_number
 import sha1
-import random
+import secrets
 
 def recMsg(socket, size):
 	data = socket.recv(size)
@@ -24,7 +24,7 @@ if __name__ == "__main__":
 		clientPubkey = list(map(int,recMsg(client, 4096).split(",")))
 		
 		aesKey = aes.generate_key()
-		iv = hmac_ours.hexToText(sha1.run(str(random.randint(0,4096)))[:32])
+		iv = hmac_ours.hexToText(sha1.run(str(secrets.randbelow(0,4096)))[:32])
 		hmacKey = hmac_ours.generate_key()
 		msg = chr(16) + aesKey + chr(16) + hmacKey + chr(16) + iv
 		msg += hmac_ours.hexToText(hmac_ours.hmac(msg,hmacKey))
