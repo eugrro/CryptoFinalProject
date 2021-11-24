@@ -49,15 +49,26 @@ class bank(object):
                     print("Tampering found, hash isn't equal")
                 else:
                     print("User accepted")
+                    auth = aes.aes_cbc_encrypt("SUCCESS",aesKey,iv)
+                    conn.sendall(auth.encode())
 
                     while True:
-                        data = conn.recv(1024)
-                        if not data:
+                        data = recMsg(conn, 4096)
+                        data = aes.aes_cbc_decrypt(data,aesKey,iv)
+                        mac = data[-20:]
+                        data = data[:-20]
+
+                        if hmac_ours.hexToText(hmac_ours.hmac(data,hmacKey)) != mac:
+                            print("Tampering found, hash isn't equal")
                             break
-                        print("Bank recieved: " + data.decode())
-                        ret = self.parseCommand(data.decode())
+
+                        if not data or data == 'q':
+                            break
+                        print("Bank received: " + data)
+                        ret = self.parseCommand(data)
                         print("Sending Back: " + ret)
-                        conn.sendall(str.encode(ret))
+                        ret = aes.aes_cbc_encrypt(ret, aesKey, iv)
+                        conn.sendall(ret.encode())
 
     def depositAmount(self, amount):
         self.userTotal += float(amount)
@@ -83,7 +94,7 @@ class bank(object):
             else:
                 return "Cannot withdraw " + str(userCommand[1]) + " dollars. Insufficient funds"
         else:
-            return "Unknown transaction has been recieved, please try again"
+            return "Unknown transaction has been received, please try again"
 
 
 bank()
