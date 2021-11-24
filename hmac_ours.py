@@ -1,6 +1,6 @@
 import sha1
 import string
-import random
+import secrets
 
 def hexToText(x):
 	tmp =''
@@ -45,6 +45,6 @@ def hmac(msg, key):
 	
 def generate_key():
 	chars = string.ascii_letters + string.digits + string.punctuation
-	return ''.join(random.choice(chars) for i in range(16))
+	return ''.join(secrets.choice(chars) for i in range(16))
 if __name__ == "__main__":
 	print(hmac("Test hmac for crypto", "CSCI 4230 T/Thr"))
