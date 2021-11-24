@@ -49,7 +49,8 @@ class bank(object):
                     print("Tampering found, hash isn't equal")
                 else:
                     print("User accepted")
-                    auth = aes.aes_cbc_encrypt("SUCCESS",aesKey,iv)
+                    msg = "SUCCESS" + hmac_ours.hexToText(hmac_ours.hmac("SUCCESS",hmacKey))
+                    auth = aes.aes_cbc_encrypt(msg,aesKey,iv)
                     conn.sendall(auth.encode())
 
                     while True:
@@ -67,6 +68,7 @@ class bank(object):
                         print("Bank received: " + data)
                         ret = self.parseCommand(data)
                         print("Sending Back: " + ret)
+                        ret += hmac_ours.hexToText(hmac_ours.hmac(ret,hmacKey))
                         ret = aes.aes_cbc_encrypt(ret, aesKey, iv)
                         conn.sendall(ret.encode())
 
@@ -74,7 +76,7 @@ class bank(object):
         self.userTotal += float(amount)
 
     def withdrawAmount(self, amount):
-        if self.userTotal > float(amount):
+        if self.userTotal >= float(amount):
             self.userTotal -= float(amount)
             return 1
         else:

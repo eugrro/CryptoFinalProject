@@ -68,6 +68,11 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             #receive auth from bank
             auth = recMsg(s, 4096)
             auth = aes.aes_cbc_decrypt(auth,aesKey,iv)
+            mac = auth[-20:]
+            auth = auth[:-20]
+            if hmac_ours.hexToText(hmac_ours.hmac(auth, hmacKey)) != mac:
+                print("Tampering found, hash isn't equal")
+                auth = ""
             if auth == "SUCCESS":
                 quit = 0
                 while True:
@@ -80,6 +85,11 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                         break
                     receiveData = recMsg(s, 4096)
                     receiveData = aes.aes_cbc_decrypt(receiveData,aesKey,iv)
+                    mac = receiveData[-20:]
+                    receiveData = receiveData[:-20]
+                    if hmac_ours.hexToText(hmac_ours.hmac(receiveData, hmacKey)) != mac:
+                        print("Tampering found, hash isn't equal")
+                        break
                     print(receiveData)
                 if quit == 1:
                     break
